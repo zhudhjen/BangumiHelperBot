@@ -1,0 +1,26 @@
+{
+  "name": "bangumi_helper",
+  "version": "1.0.0",
+  "description": "A telegram bot to provide information from bangumi.tv",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhudhjen/BangumiHelperBot.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "telegram",
+    "bot"
+  ],
+  "author": "Pitaya Zhu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhudhjen/BangumiHelperBot/issues"
+  },
+  "homepage": "https://github.com/zhudhjen/BangumiHelperBot#readme"
+}
