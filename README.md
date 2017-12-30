@@ -12,6 +12,6 @@ Packages needed:
 Prepare your token as `token.js` and export the token string. Then execute the follow commands in the directory:
 
 ```shell
-# node start
+# npm start
 ```
 
