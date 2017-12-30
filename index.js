@@ -4,19 +4,21 @@ var bodyParser = require('body-parser');
 const axios = require('axios');
 const token = require('./token');
 
-app.user(bodyParser.json());
-app.user(bodyParser.urlencoded({
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.post('/new-message', function(req, res) {
+app.post('/', function(req, res) {
+    console.log('Request received');
+
     const {message} = req.body;
 
-    if (!message || message.text.toLowerCase().indexOf('macro') < 0) {
+    if (!message) {
         return res.end();
     }
 
-    axios.post('https://api.telegram.org/' + token + '/sendMessage', {
+    axios.post('https://api.telegram.org/bot' + token + '/sendMessage', {
         chat_id: message.chat.id,
         text: 'Poi~'
     })
@@ -26,6 +28,7 @@ app.post('/new-message', function(req, res) {
     })
     .catch(err => {
         console.log('Error: ', err);
+        // console.log('Error');
         res.end('Error: ' + err);
     });
 });
