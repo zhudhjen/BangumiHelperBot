@@ -53,14 +53,14 @@ function sendMessage(id, text, res) {
         chat_id: id,
         text: text
     })
-    .then(response => {
-        console.log('Message sent');
-        res.end('ok');
-    })
-    .catch(err => {
-        console.log('Error: ', err);
-        res.end('Error: ' + err);
-    });
+        .then(response => {
+            console.log('Message sent');
+            res.end('ok');
+        })
+        .catch(err => {
+            console.log('Error: ', err);
+            res.end('Error: ' + err);
+        });
 }
 
 app.post('/', function(req, res) {
@@ -76,7 +76,7 @@ app.post('/', function(req, res) {
 
     console.log(message.entities);
 
-    let result = message.match(/^\/(\w+)\s*(.*)/);
+    let result = message.text.match(/^\/(\w+)\s*(.*)/);
 
     // input is not command
     if (!result) {
@@ -101,25 +101,37 @@ app.post('/', function(req, res) {
         console.log('Meta command "' + command + '" not found');
         sendMessage(id, "Sorry, meta commands not implemented yet", res);
     } else {
-        console.log('searching');
-        axios.get('https://bgm.tv/' + cmd_info.type + '_search/' + param, {
+        let url ='http://bangumi.tv/' + cmd_info.type + '_search/' + param;
+        console.log('searching: ' + url);
+
+        axios.get(url, {
             params: {
                 'cat': cmd_info.cat
-            },
-            transformResponse: data => {
-                console.log(data);
-                return cheerio.load(data);
             }
         })
-            .then($ => {
+            .then(response => {
+                const $ = cheerio.load(response.data);
+                if (!$('#columnSearchB').length) {
+                    // there is a typo in the original html code
+                    if ($('#colunmNotice').length) {
+                        sendMessage(id, 'Error: ' + $('p.text', '#colunmNotice').text(), res);
+                    } else {
+                        sendMessage(id, 'Error: search result not valid', res);
+                    }
+                    return;
+                }
+                console.log('Found area');
                 let results = $('#columnSearchB').find('.light_odd');
                 if (results.length === 0) {
+                    console.log('Entity not found');
                     sendMessage(id, 'Sorry, no such ' + command + ' "' + param + '" found');
                 } else {
+                    console.log('Found entity');
                     let entity = results[0];
                     console.log(entity);
                     let entity_name;
                     let name_tag = $('h2>a', entity);
+                    console.log('Searching for the name');
                     if (name_tag.has('span')) {
                         entity_name = name_tag.text().slice(0, -4);
                     } else {
@@ -132,7 +144,6 @@ app.post('/', function(req, res) {
                 console.log('Error: ' + err.message);
                 sendMessage(id, 'Error: ' + err.message, res);
             });
-        sendMessage(id, 'Sorry, meta commands not implemented yet', res);
     }
 
 });
