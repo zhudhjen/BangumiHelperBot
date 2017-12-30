@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var cheerio = require('cheerio');
 const axios = require('axios');
 const token = require('./token');
 
@@ -18,9 +19,46 @@ app.post('/', function(req, res) {
         return res.end();
     }
 
+    console.log(message.entities);
+
+    const re = /^\/(\w+)\s*(.*)/;
+    let result = re.exec(message.text);
+
+    if (!result) {
+        return res.end();
+    }
+
+    let command = result[1];
+    let param = result[2];
+
+    console.log({
+        'command': command,
+        'param': param
+    });
+
+    const search_keywords = {
+        'book': {
+            'type': 'subject',
+            'cat': '1'
+        },
+        'anime': {
+            'type': 'subject',
+            'cat': '2'
+        },
+        'music': {
+            'type': 'subject',
+            'cat': '3'
+        },
+        'game': {
+            'type': 'subject',
+            'cat': '4'
+        },
+    }
+    if (command.match)
+
     axios.post('https://api.telegram.org/bot' + token + '/sendMessage', {
         chat_id: message.chat.id,
-        text: 'Poi~'
+        text: 'Poi~' + param
     })
     .then(response => {
         console.log('Message sent');
@@ -28,7 +66,6 @@ app.post('/', function(req, res) {
     })
     .catch(err => {
         console.log('Error: ', err);
-        // console.log('Error');
         res.end('Error: ' + err);
     });
 });
