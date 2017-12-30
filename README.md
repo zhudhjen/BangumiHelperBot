@@ -1,7 +1,9 @@
 # Bangumi Helper Bot
-A telegram bot to provide information from bangumi.tv
+A telegram bot (@bangumi_helper_bot) to provide information from bangumi.tv.
 
-### Usage
+Currently it provides information of the first search result.
+
+## Usage
 
 Packages needed:
 
@@ -9,7 +11,7 @@ Packages needed:
 - Axios
 - BodyParser
 
-Prepare your token as `token.js` and export the token string. Then execute the follow commands in the directory:
+Create `token.js` and export the token string. Then execute the following commands:
 
 ```shell
 # npm start
