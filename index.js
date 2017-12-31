@@ -104,7 +104,7 @@ app.post('/', function(req, res) {
         let url ='http://bangumi.tv/' + cmd_info.type + '_search/' + param + '?cat=' + cmd_info.cat;
         console.log('searching: ' + url);
 
-        axios.get(url)
+        axios.get(encodeURI(url))
             .then(response => {
                 const $ = cheerio.load(response.data);
                 let item_list = $('#browserItemList');
@@ -117,7 +117,6 @@ app.post('/', function(req, res) {
                     }
                     return;
                 }
-                console.log('Found area');
                 let items = item_list.children();
                 if (items.length === 0) {
                     console.log('Entity not found');
@@ -125,15 +124,19 @@ app.post('/', function(req, res) {
                 } else {
                     console.log('Found entity');
                     let entity = items[0];
-                    console.log(entity);
-                    let entity_name;
-                    let name_tag = $('h2>a', entity);
+                    let entity_name = $('h3>a', entity).text();
+                    /*
+                    let name_tag = $('h3>a', entity);
                     console.log('Searching for the name');
                     if (name_tag.has('span')) {
                         entity_name = name_tag.text().slice(0, -4);
                     } else {
                         entity_name = name_tag.text().slice(0, -1);
                     }
+                    */
+                    console.log({
+                        name: entity_name
+                    });
                     sendMessage(id, entity_name, res);
                 }
             })
