@@ -101,14 +101,10 @@ app.post('/', function(req, res) {
         console.log('Meta command "' + command + '" not found');
         sendMessage(id, "Sorry, meta commands not implemented yet", res);
     } else {
-        let url ='http://bangumi.tv/' + cmd_info.type + '_search/' + param;
+        let url ='http://bangumi.tv/' + cmd_info.type + '_search/' + param + '?cat=' + cmd_info.cat;
         console.log('searching: ' + url);
 
-        axios.get(url, {
-            params: {
-                'cat': cmd_info.cat
-            }
-        })
+        axios.get(url)
             .then(response => {
                 const $ = cheerio.load(response.data);
                 let item_list = $('#browserItemList');
