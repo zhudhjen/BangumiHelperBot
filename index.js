@@ -107,8 +107,7 @@ app.post('/', function(req, res) {
         axios.get(encodeURI(url))
             .then(response => {
                 const $ = cheerio.load(response.data);
-                let item_list = $('#browserItemList');
-                if (!item_list.length) {
+                if (!$('#columnSearchB').length) {
                     // there is a typo in the original html code
                     if ($('#colunmNotice').length) {
                         sendMessage(id, 'Error: ' + $('p.text', '#colunmNotice').text(), res);
@@ -117,27 +116,64 @@ app.post('/', function(req, res) {
                     }
                     return;
                 }
-                let items = item_list.children();
-                if (items.length === 0) {
-                    console.log('Entity not found');
-                    sendMessage(id, 'Sorry, no such ' + command + ' "' + param + '" found');
-                } else {
-                    console.log('Found entity');
-                    let entity = items[0];
-                    let entity_name = $('h3>a', entity).text();
-                    /*
-                    let name_tag = $('h3>a', entity);
-                    console.log('Searching for the name');
-                    if (name_tag.has('span')) {
-                        entity_name = name_tag.text().slice(0, -4);
+                if (cmd_info.type === 'subject') {
+                    let items = $('#browserItemList').find('li.item');
+                    if (items.length === 0) {
+                        console.log('Entity not found');
+                        sendMessage(id, 'Sorry, no such ' + command + ' "' + param + '" found');
                     } else {
-                        entity_name = name_tag.text().slice(0, -1);
+                        console.log('Found entity');
+                        let entity = items[0];
+                        let entity_name = $('h3>a', entity).text();
+                        console.log({
+                            name: entity_name
+                        });
+                        sendMessage(id, entity_name, res);
                     }
-                    */
-                    console.log({
-                        name: entity_name
-                    });
-                    sendMessage(id, entity_name, res);
+                } else {
+                    let items = $('#columnSearchB').find('.light_odd');
+                    if (items.length === 0) {
+                        console.log('Entity not found');
+                        sendMessage(id, 'Sorry, no such ' + command + ' "' + param + '" found');
+                    } else {
+                        console.log('Found entity');
+                        let entity = items[0];
+
+                        let message, entity_name, entity_original_name, entity_info, entity_info_cleaned;
+
+                        // find name
+                        let name_tag = $('h2>a', entity);
+                        console.log('Searching for the name');
+                        if (name_tag.has('span')) {
+                            entity_name = name_tag.text().slice(0, -4);
+                            entity_original_name = $('span', name_tag).text();
+                            message = entity_name + ' / ' + entity_original_name;
+                        } else {
+                            entity_name = name_tag.text().slice(0, -1);
+                            message = entity_name;
+                        }
+
+                        // find info
+                        let info_tag = $('div.prsn_info', entity);
+                        if (info_tag.length !== 0) {
+                            entity_info = info_tag.text().split('/');
+                            entity_info_cleaned = [];
+                            for (let i = 0; i < entity_info.length; i++) {
+                                if (entity_info[i].trim() !== '') {
+                                    entity_info_cleaned.push(entity_info[i].trim());
+                                }
+                            }
+                            message += '\n\n' + entity_info_cleaned.join('\n');
+                        }
+
+                        console.log({
+                            name: entity_name,
+                            origin_name: entity_original_name,
+                            info: entity_info_cleaned
+                        });
+
+                        sendMessage(id, message, res);
+                    }
                 }
             })
             .catch(err => {
