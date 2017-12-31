@@ -111,7 +111,8 @@ app.post('/', function(req, res) {
         })
             .then(response => {
                 const $ = cheerio.load(response.data);
-                if (!$('#columnSearchB').length) {
+                let item_list = $('#browserItemList');
+                if (!item_list.length) {
                     // there is a typo in the original html code
                     if ($('#colunmNotice').length) {
                         sendMessage(id, 'Error: ' + $('p.text', '#colunmNotice').text(), res);
@@ -121,13 +122,13 @@ app.post('/', function(req, res) {
                     return;
                 }
                 console.log('Found area');
-                let results = $('#columnSearchB').find('.light_odd');
-                if (results.length === 0) {
+                let items = item_list.children();
+                if (items.length === 0) {
                     console.log('Entity not found');
                     sendMessage(id, 'Sorry, no such ' + command + ' "' + param + '" found');
                 } else {
                     console.log('Found entity');
-                    let entity = results[0];
+                    let entity = items[0];
                     console.log(entity);
                     let entity_name;
                     let name_tag = $('h2>a', entity);
