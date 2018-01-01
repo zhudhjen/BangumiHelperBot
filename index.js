@@ -104,7 +104,11 @@ app.post('/', function(req, res) {
         let url ='http://bangumi.tv/' + cmd_info.type + '_search/' + param + '?cat=' + cmd_info.cat;
         console.log('searching: ' + url);
 
-        axios.get(encodeURI(url))
+        axios.get(encodeURI(url), {
+            headers: {
+                Cookie: "chii_searchDateLine=0"
+            }
+        })
             .then(response => {
                 const $ = cheerio.load(response.data);
                 if (!$('#columnSearchB').length) {
@@ -145,7 +149,7 @@ app.post('/', function(req, res) {
                         let name_tag = $('h2>a', entity);
                         console.log('Searching for the name');
                         if (name_tag.has('span')) {
-                            entity_name = name_tag.text().slice(0, -4);
+                            entity_name = name_tag.clone().children().remove().end().text().slice(0, -4);
                             entity_original_name = $('span', name_tag).text();
                             message = entity_name + ' / ' + entity_original_name;
                         } else {
